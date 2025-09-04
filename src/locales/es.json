@@ -1,0 +1,74 @@
+{
+  "lesson": {
+    "start": {
+      "title": "¿Listo para empezar?",
+      "estimatedTime": "{{time}} min",
+      "startButton": "Empezar Lección",
+      "hearts": "Corazones",
+      "streak": "Racha"
+    },
+    "exercise": {
+      "submitAnswer": "Enviar",
+      "continue": "Continuar",
+      "skip": "Saltar",
+      "checkAnswer": "Verificar Respuesta",
+      "nextExercise": "Siguiente"
+    },
+    "feedback": {
+      "correct": "¡Correcto!",
+      "incorrect": "Incorrecto",
+      "tryAgain": "Inténtalo de nuevo",
+      "wellDone": "¡Bien hecho!",
+      "keepGoing": "¡Sigue así!"
+    },
+    "completion": {
+      "title": "¡Lección Completada!",
+      "congratulations": "¡Felicitaciones!",
+      "xpEarned": "{{xp}} XP obtenidos",
+      "streakIncrement": "Racha +{{streak}}",
+      "restartLesson": "Reiniciar Lección",
+      "nextLesson": "Siguiente Lección"
+    },
+    "progress": {
+      "exercise": "Ejercicio {{current}} de {{total}}"
+    }
+  },
+  "exercises": {
+    "multipleChoice": {
+      "instruction": "Selecciona la respuesta correcta"
+    },
+    "typeAnswer": {
+      "instruction": "Escribe la traducción",
+      "placeholder": "Escribe tu respuesta aquí..."
+    },
+    "wordBank": {
+      "instruction": "Toca las palabras para construir la oración"
+    },
+    "matchPairs": {
+      "instruction": "Empareja haciendo clic en ellos"
+    },
+    "listeningPrompt": {
+      "instruction": "Escribe lo que escuchas",
+      "audioNotAvailable": "Audio no disponible",
+      "playAudio": "Reproducir Audio"
+    }
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Algo salió mal",
+    "retry": "Intentar de Nuevo",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "done": "Hecho",
+    "cancel": "Cancelar"
+  },
+  "accessibility": {
+    "heartsRemaining": "{{count}} corazones restantes",
+    "currentStreak": "Racha actual: {{streak}}",
+    "progressBar": "Progreso: {{current}} de {{total}} ejercicios completos",
+    "selectedAnswer": "Respuesta seleccionada: {{answer}}",
+    "correctAnswer": "Respuesta correcta: {{answer}}",
+    "exerciseComplete": "Ejercicio completo",
+    "lessonComplete": "Lección completa"
+  }
+}

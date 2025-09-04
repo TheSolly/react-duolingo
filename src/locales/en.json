@@ -1,0 +1,74 @@
+{
+  "lesson": {
+    "start": {
+      "title": "Ready to start?",
+      "estimatedTime": "{{time}} min",
+      "startButton": "Start Lesson",
+      "hearts": "Hearts",
+      "streak": "Streak"
+    },
+    "exercise": {
+      "submitAnswer": "Submit",
+      "continue": "Continue",
+      "skip": "Skip",
+      "checkAnswer": "Check Answer",
+      "nextExercise": "Next"
+    },
+    "feedback": {
+      "correct": "Correct!",
+      "incorrect": "Incorrect",
+      "tryAgain": "Try again",
+      "wellDone": "Well done!",
+      "keepGoing": "Keep going!"
+    },
+    "completion": {
+      "title": "Lesson Complete!",
+      "congratulations": "Congratulations!",
+      "xpEarned": "{{xp}} XP earned",
+      "streakIncrement": "Streak +{{streak}}",
+      "restartLesson": "Restart Lesson",
+      "nextLesson": "Next Lesson"
+    },
+    "progress": {
+      "exercise": "Exercise {{current}} of {{total}}"
+    }
+  },
+  "exercises": {
+    "multipleChoice": {
+      "instruction": "Select the correct answer"
+    },
+    "typeAnswer": {
+      "instruction": "Type the translation",
+      "placeholder": "Type your answer here..."
+    },
+    "wordBank": {
+      "instruction": "Tap the words to build the sentence"
+    },
+    "matchPairs": {
+      "instruction": "Match the pairs by clicking on them"
+    },
+    "listeningPrompt": {
+      "instruction": "Type what you hear",
+      "audioNotAvailable": "Audio not available",
+      "playAudio": "Play Audio"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try Again",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "cancel": "Cancel"
+  },
+  "accessibility": {
+    "heartsRemaining": "{{count}} hearts remaining",
+    "currentStreak": "Current streak: {{streak}}",
+    "progressBar": "Progress: {{current}} of {{total}} exercises complete",
+    "selectedAnswer": "Selected answer: {{answer}}",
+    "correctAnswer": "Correct answer: {{answer}}",
+    "exerciseComplete": "Exercise complete",
+    "lessonComplete": "Lesson complete"
+  }
+}

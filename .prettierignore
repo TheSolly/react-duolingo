@@ -1,0 +1,10 @@
+node_modules
+dist
+build
+coverage
+.next
+.nuxt
+.vscode
+.idea
+*.min.js
+*.min.css

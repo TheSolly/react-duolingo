@@ -1,0 +1,58 @@
+{
+  "id": "lesson-basics-1",
+  "title": "Basics 1 — Greetings",
+  "xp_per_correct": 10,
+  "streak_increment": 1,
+  "exercises": [
+    {
+      "id": "ex1",
+      "type": "multiple_choice",
+      "prompt_en": "Select the translation for: Hello",
+      "choices": ["Hola", "Adiós", "Gracias"],
+      "answer": "Hola",
+      "explanation_en": "\\\"Hola\\\" means Hello in Spanish."
+    },
+    {
+      "id": "ex2",
+      "type": "type_answer",
+      "prompt_en": "Type the translation for: Thank you",
+      "answer": ["gracias"],
+      "tolerance": {"caseInsensitive": true, "trim": true},
+      "explanation_en": "\\\"Gracias\\\" means Thank you."
+    },
+    {
+      "id": "ex3",
+      "type": "word_bank",
+      "prompt_en": "Build: See you later",
+      "bank": ["te", "veo", "más", "tarde", "hasta", "luego"],
+      "answer": ["hasta", "luego"],
+      "explanation_en": "Phrase commonly taught as a set: \\\"Hasta luego.\\\""
+    },
+    {
+      "id": "ex4",
+      "type": "match_pairs",
+      "prompt_en": "Match pairs",
+      "pairs": [
+        {"left": "Hello", "right": "Hola"},
+        {"left": "Goodbye", "right": "Adiós"}
+      ],
+      "explanation_en": "Match each English word to its Spanish translation."
+    },
+    {
+      "id": "ex5",
+      "type": "multiple_choice",
+      "prompt_en": "Select the translation for: Goodbye",
+      "choices": ["Gracias", "Adiós", "Por favor"],
+      "answer": "Adiós",
+      "explanation_en": "\\\"Adiós\\\" is Goodbye."
+    },
+    {
+      "id": "ex6",
+      "type": "type_answer",
+      "prompt_en": "Type the translation for: Please",
+      "answer": ["por favor"],
+      "tolerance": {"caseInsensitive": true, "trim": true},
+      "explanation_en": "\\\"Por favor\\\" means Please."
+    }
+  ]
+}
