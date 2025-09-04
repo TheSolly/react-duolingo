@@ -1,4 +1,4 @@
-import { useReducer, useEffect } from 'react';
+import { useReducer, useEffect, useMemo, useRef } from 'react';
 import {
   LessonState,
   LessonAction,
@@ -52,7 +52,6 @@ function lessonReducer(state: LessonState, action: LessonAction): LessonState {
         xp: isCorrect
           ? state.xp + (state.lesson?.xp_per_correct || 10)
           : state.xp,
-        hearts: isCorrect ? state.hearts : Math.max(0, state.hearts - 1),
       };
     }
 
@@ -129,25 +128,41 @@ function getCurrentExerciseAnswer(
   }
 }
 
-export function useLessonState() {
+export function useLessonState(updateUserStats?: (xp: number, streak: number) => void) {
   const [state, dispatch] = useReducer(lessonReducer, initialLessonState);
+  const hasLoadedInitialState = useRef(false);
 
-  // Load saved state on mount
+  // Load saved state on mount, only once
   useEffect(() => {
-    const savedState = storageUtils.loadLessonState();
-    if (savedState) {
-      dispatch({ type: 'LOAD_SAVED_STATE', payload: savedState });
+    if (!hasLoadedInitialState.current) {
+      hasLoadedInitialState.current = true;
+      const savedState = storageUtils.loadLessonState();
+      if (savedState) {
+        console.log('🔄 Found saved lesson state:', { 
+          currentExerciseIndex: savedState.currentExerciseIndex,
+          hearts: savedState.hearts,
+          answersCount: Object.keys(savedState.answers || {}).length,
+          lessonId: savedState.lesson?.id
+        });
+        dispatch({ type: 'LOAD_SAVED_STATE', payload: savedState });
+      } else {
+        console.log('📝 No saved lesson state found');
+      }
     }
   }, []);
 
   // Save state to localStorage whenever it changes
   useEffect(() => {
-    if (state.lesson) {
+    if (state.lesson && state.currentExerciseIndex >= 0) {
+      console.log('Saving lesson state:', {
+        currentExerciseIndex: state.currentExerciseIndex,
+        hearts: state.hearts
+      });
       storageUtils.saveLessonState(state);
     }
   }, [state]);
 
-  const actions = {
+  const actions = useMemo(() => ({
     loadLesson: (lesson: Lesson) => {
       dispatch({ type: 'LOAD_LESSON', payload: lesson });
     },
@@ -176,7 +191,13 @@ export function useLessonState() {
       dispatch({ type: 'COMPLETE_LESSON' });
       // Update global user stats
       if (state.lesson) {
-        storageUtils.updateUserStats(state.xp, state.lesson.streak_increment);
+        if (updateUserStats) {
+          // Use the callback if provided (preferred)
+          updateUserStats(state.xp, state.lesson.streak_increment);
+        } else {
+          // Fallback to direct storage update
+          storageUtils.updateUserStats(state.xp, state.lesson.streak_increment);
+        }
       }
       // Clear saved lesson state since it's complete
       storageUtils.clearLessonState();
@@ -185,7 +206,7 @@ export function useLessonState() {
     restartLesson: () => {
       dispatch({ type: 'RESTART_LESSON' });
     },
-  };
+  }), [state.lesson, state.xp, updateUserStats]);
 
   return {
     state,

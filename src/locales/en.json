@@ -5,7 +5,10 @@
       "estimatedTime": "{{time}} min",
       "startButton": "Start Lesson",
       "hearts": "Hearts",
-      "streak": "Streak"
+      "streak": "Streak",
+      "xp": "XP",
+      "exercises": "exercises",
+      "completionDescription": "Complete {{count}} exercises to earn {{xp}} XP"
     },
     "exercise": {
       "submitAnswer": "Submit",
@@ -27,7 +30,12 @@
       "xpEarned": "{{xp}} XP earned",
       "streakIncrement": "Streak +{{streak}}",
       "restartLesson": "Restart Lesson",
-      "nextLesson": "Next Lesson"
+      "nextLesson": "Next Lesson",
+      "motivationalMessage": {
+        "excellent": "Excellent work! You're making great progress.",
+        "good": "Good job! Keep practicing to improve your accuracy.",
+        "keepPracticing": "Keep practicing! Every lesson helps you improve."
+      }
     },
     "progress": {
       "exercise": "Exercise {{current}} of {{total}}"
@@ -35,22 +43,29 @@
   },
   "exercises": {
     "multipleChoice": {
-      "instruction": "Select the correct answer"
+      "instruction": "Select the correct answer",
+      "name": "Multiple Choice"
     },
     "typeAnswer": {
       "instruction": "Type the translation",
-      "placeholder": "Type your answer here..."
+      "placeholder": "Type your answer here...",
+      "caseInsensitive": "Case insensitive",
+      "spacesIgnored": "Spaces ignored",
+      "name": "Type Answer"
     },
     "wordBank": {
-      "instruction": "Tap the words to build the sentence"
+      "instruction": "Tap the words to build the sentence",
+      "name": "Word Bank"
     },
     "matchPairs": {
-      "instruction": "Match the pairs by clicking on them"
+      "instruction": "Match the pairs by clicking on them",
+      "name": "Match Pairs"
     },
     "listeningPrompt": {
       "instruction": "Type what you hear",
       "audioNotAvailable": "Audio not available",
-      "playAudio": "Play Audio"
+      "playAudio": "Play Audio",
+      "name": "Listening"
     }
   },
   "common": {
@@ -61,6 +76,20 @@
     "next": "Next",
     "done": "Done",
     "cancel": "Cancel"
+  },
+  "hearts": {
+    "noHeartsLeft": "No hearts left!",
+    "noHeartsMessage": "You've run out of hearts. Keep practicing to improve!",
+    "startOver": "Start Over"
+  },
+  "completion": {
+    "xpEarned": "XP Earned",
+    "streak": "Streak",
+    "accuracy": "Accuracy",
+    "lessonSummary": "Lesson Summary",
+    "exercisesCompleted": "Exercises Completed",
+    "correctAnswers": "Correct Answers",
+    "totalXP": "Total XP"
   },
   "accessibility": {
     "heartsRemaining": "{{count}} hearts remaining",

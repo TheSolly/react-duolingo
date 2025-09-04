@@ -25,7 +25,7 @@ function MatchPairs({
   onAnswerSubmit,
   disabled = false,
 }: MatchPairsProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [leftItems, setLeftItems] = useState<PairItem[]>([]);
   const [rightItems, setRightItems] = useState<PairItem[]>([]);
   const [selectedLeft, setSelectedLeft] = useState<string>('');
@@ -155,7 +155,11 @@ function MatchPairs({
   return (
     <div className="exercise match-pairs">
       <div className="exercise-header">
-        <h2 className="exercise-prompt">{exercise.prompt_en}</h2>
+        <h2 className="exercise-prompt">
+          {i18n.language === 'es' && exercise.prompt_es 
+            ? exercise.prompt_es 
+            : exercise.prompt_en}
+        </h2>
         <p className="exercise-instruction">
           {t('exercises.matchPairs.instruction')}
         </p>

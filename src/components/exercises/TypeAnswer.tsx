@@ -14,7 +14,7 @@ function TypeAnswer({
   onAnswerSubmit,
   disabled = false,
 }: TypeAnswerProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [userInput, setUserInput] = useState('');
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -54,7 +54,11 @@ function TypeAnswer({
   return (
     <div className="exercise type-answer">
       <div className="exercise-header">
-        <h2 className="exercise-prompt">{exercise.prompt_en}</h2>
+        <h2 className="exercise-prompt">
+          {i18n.language === 'es' && exercise.prompt_es 
+            ? exercise.prompt_es 
+            : exercise.prompt_en}
+        </h2>
         <p className="exercise-instruction">
           {t('exercises.typeAnswer.instruction')}
         </p>
@@ -85,11 +89,11 @@ function TypeAnswer({
             <span className="character-count">{userInput.length}/100</span>
             {exercise.tolerance && (
               <span className="tolerance-hint">
-                {exercise.tolerance.caseInsensitive && 'Case insensitive'}
+                {exercise.tolerance.caseInsensitive && t('exercises.typeAnswer.caseInsensitive')}
                 {exercise.tolerance.caseInsensitive &&
                   exercise.tolerance.trim &&
                   ' • '}
-                {exercise.tolerance.trim && 'Spaces ignored'}
+                {exercise.tolerance.trim && t('exercises.typeAnswer.spacesIgnored')}
               </span>
             )}
           </div>

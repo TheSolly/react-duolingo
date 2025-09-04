@@ -20,7 +20,7 @@ import MatchPairs from './exercises/MatchPairs';
 import ListeningPrompt from './exercises/ListeningPrompt';
 
 function ExercisePlayer() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { state, actions } = useLessonContext();
   const [feedback, setFeedback] = useState<FeedbackState>({
     type: 'none',
@@ -44,14 +44,12 @@ function ExercisePlayer() {
     }
   }, [isComplete, actions]);
 
-  if (!lesson || isComplete) {
-    return null;
-  }
-
-  const currentExercise = lesson.exercises[
+  const currentExercise = lesson?.exercises[
     currentExerciseIndex
   ] as ExerciseUnion;
-  const isLastExercise = currentExerciseIndex === lesson.exercises.length - 1;
+  const isLastExercise = lesson
+    ? currentExerciseIndex === lesson.exercises.length - 1
+    : false;
 
   const handleAnswerSubmit = (
     userAnswer: string | string[],
@@ -61,12 +59,19 @@ function ExercisePlayer() {
 
     actions.submitAnswer(currentExercise.id, userAnswer, isCorrect, timeSpent);
 
+    const explanation =
+      i18n.language === 'es'
+        ? currentExercise.explanation_es ||
+          currentExercise.explanation_en
+        : currentExercise.explanation_en;
+
+
     setFeedback({
       type: isCorrect ? 'correct' : 'incorrect',
       message: isCorrect
         ? t('lesson.feedback.correct')
         : t('lesson.feedback.incorrect'),
-      explanation: currentExercise.explanation_en,
+      explanation,
     });
 
     setIsAnswerSubmitted(true);
@@ -77,9 +82,24 @@ function ExercisePlayer() {
   };
 
   const handleContinue = () => {
+    console.log('handleContinue called:', {
+      currentExerciseIndex,
+      isLastExercise,
+      totalExercises: lesson?.exercises.length,
+    });
+
+    setIsAnswerSubmitted(false);
+    setFeedback({
+      type: 'none',
+      message: '',
+      explanation: '',
+    });
+
     if (isLastExercise) {
+      console.log('Completing lesson...');
       actions.completeLesson();
     } else {
+      console.log('Moving to next exercise...');
       actions.nextExercise();
     }
   };
@@ -119,7 +139,9 @@ function ExercisePlayer() {
             exercise={currentExercise as MatchPairsExercise}
             onAnswerSubmit={(userAnswer, isCorrect) => {
               // Convert pairs to string format for consistency
-              const answerString = userAnswer.map(pair => `${pair.left}-${pair.right}`);
+              const answerString = userAnswer.map(
+                (pair) => `${pair.left}-${pair.right}`
+              );
               handleAnswerSubmit(answerString, isCorrect);
             }}
             disabled={isAnswerSubmitted}
@@ -138,11 +160,18 @@ function ExercisePlayer() {
       default:
         return (
           <div className="exercise-error">
-            <p>Unsupported exercise type: {(currentExercise as ExerciseUnion).type}</p>
+            <p>
+              Unsupported exercise type:{' '}
+              {(currentExercise as ExerciseUnion).type}
+            </p>
           </div>
         );
     }
   };
+
+  if (!lesson || isComplete) {
+    return null;
+  }
 
   return (
     <div className="exercise-player">
@@ -160,13 +189,13 @@ function ExercisePlayer() {
         {hearts === 0 && (
           <div className="hearts-depleted" role="alert">
             <div className="hearts-depleted-content">
-              <h3>💔 No hearts left!</h3>
-              <p>You've run out of hearts. Keep practicing to improve!</p>
+              <h3>💔 {t('hearts.noHeartsLeft')}</h3>
+              <p>{t('hearts.noHeartsMessage')}</p>
               <button
                 onClick={() => actions.restartLesson()}
                 className="restart-button"
               >
-                Start Over
+                {t('hearts.startOver')}
               </button>
             </div>
           </div>

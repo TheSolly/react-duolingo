@@ -9,14 +9,42 @@ import {
 import lessonData from '../data/lesson-basics-1.json';
 
 /**
- * Loads lesson data with error handling
+ * Test function to simulate various error conditions
+ * Usage: Add ?error=malformed to URL to test
+ */
+function simulateError() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const errorType = urlParams.get('error');
+  
+  switch (errorType) {
+    case 'malformed':
+      throw new Error('Lesson data is malformed or missing required fields. Please try refreshing the page.');
+    case 'empty':
+      throw new Error('This lesson appears to be empty. Please contact support if this problem persists.');
+    case 'notfound':
+      throw new Error('Lesson "advanced-1" not found. Please check the lesson ID and try again.');
+    case 'network':
+      throw new Error('Unable to load lesson data. Please check your internet connection and try again.');
+  }
+}
+
+/**
+ * Loads lesson data with comprehensive error handling
  */
 export async function loadLesson(lessonId: string): Promise<Lesson> {
   try {
+    // Check for simulated errors (for testing) - always run this first
+    simulateError();
+    
     // In a real app, this would be an API call
     // For now, we only have one lesson
     if (lessonId !== 'lesson-basics-1') {
-      throw new Error(`Lesson with id "${lessonId}" not found`);
+      throw new Error(`Lesson "${lessonId}" not found. Please check the lesson ID and try again.`);
+    }
+
+    // Validate that lesson data exists
+    if (!lessonData) {
+      throw new Error('Lesson data is empty or corrupted. Please refresh the page or contact support.');
     }
 
     // Validate lesson data structure
@@ -28,17 +56,17 @@ export async function loadLesson(lessonId: string): Promise<Lesson> {
       !lesson.exercises ||
       !Array.isArray(lesson.exercises)
     ) {
-      throw new Error('Invalid lesson data structure');
+      throw new Error('Lesson data is malformed or missing required fields. Please try refreshing the page.');
     }
 
     if (lesson.exercises.length === 0) {
-      throw new Error('Lesson must contain at least one exercise');
+      throw new Error('This lesson appears to be empty. Please contact support if this problem persists.');
     }
 
     // Validate each exercise
     lesson.exercises.forEach((exercise, index) => {
       if (!exercise.id || !exercise.type || !exercise.prompt_en) {
-        throw new Error(`Invalid exercise data at index ${index}`);
+        throw new Error(`Exercise ${index + 1} is missing required data. Please try refreshing the page.`);
       }
 
       // Type-specific validation

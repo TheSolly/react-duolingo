@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { AppProvider } from './contexts/AppContext';
 import { LessonProvider } from './contexts/LessonContext';
 import { useAppContext } from './contexts/AppContext';
@@ -18,6 +18,7 @@ function AppContent() {
   const { state: lessonState, actions: lessonActions } = useLessonContext();
   const { i18n } = useTranslation();
   const [currentScreen, setCurrentScreen] = useState<AppScreen>('start');
+  const hasLoadedLesson = useRef(false);
 
   const loadLessonData = useCallback(async () => {
     try {
@@ -39,21 +40,97 @@ function AppContent() {
     i18n.changeLanguage(appState.locale);
   }, [appState.locale, i18n]);
 
+  // Load lesson only once on mount, but only if no lesson is already loaded from localStorage
   useEffect(() => {
-    loadLessonData();
-  }, [loadLessonData]);
+    // Check for error simulation immediately
+    const urlParams = new URLSearchParams(window.location.search);
+    const errorType = urlParams.get('error');
+    
+    if (errorType) {
+      // Force error state for testing
+      let errorMessage = 'An error occurred';
+      switch (errorType) {
+        case 'malformed':
+          errorMessage = 'Lesson data is malformed or missing required fields. Please try refreshing the page.';
+          break;
+        case 'empty':
+          errorMessage = 'This lesson appears to be empty. Please contact support if this problem persists.';
+          break;
+        case 'notfound':
+          errorMessage = 'Lesson "advanced-1" not found. Please check the lesson ID and try again.';
+          break;
+        case 'network':
+          errorMessage = 'Unable to load lesson data. Please check your internet connection and try again.';
+          break;
+      }
+      
+      appActions.setError(errorMessage);
+      setCurrentScreen('error');
+      hasLoadedLesson.current = true;
+      return;
+    }
+    
+    // Add a small delay to let localStorage load first
+    const timer = setTimeout(() => {
+      if (!hasLoadedLesson.current && !lessonState.lesson) {
+        hasLoadedLesson.current = true;
+        
+        const loadData = async () => {
+          try {
+            appActions.setLoading(true);
+            appActions.setError(null);
+            console.log('🆕 Loading fresh lesson data...');
+
+            const lesson = await loadLesson('lesson-basics-1');
+            lessonActions.loadLesson(lesson);
+          } catch (error) {
+            appActions.setError(
+              error instanceof Error ? error.message : 'Failed to load lesson'
+            );
+            setCurrentScreen('error');
+          } finally {
+            appActions.setLoading(false);
+          }
+        };
+
+        loadData();
+      } else if (lessonState.lesson) {
+        console.log('✅ Using existing lesson data from localStorage');
+        hasLoadedLesson.current = true;
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [appActions, lessonActions, lessonState.lesson]);
 
   useEffect(() => {
-    if (
-      lessonState.lesson &&
-      lessonState.currentExerciseIndex === 0 &&
-      !lessonState.isComplete
-    ) {
-      setCurrentScreen('start');
-    } else if (lessonState.isComplete) {
+    console.log('🎯 App screen logic:', {
+      isComplete: lessonState.isComplete,
+      currentExerciseIndex: lessonState.currentExerciseIndex,
+      currentScreen,
+      hasLesson: !!lessonState.lesson,
+      answersCount: Object.keys(lessonState.answers).length,
+    });
+
+    if (lessonState.isComplete) {
+      console.log('Setting screen to complete');
       setCurrentScreen('complete');
+    } else if (
+      lessonState.lesson &&
+      currentScreen !== 'lesson'
+    ) {
+      // Check if this is a fresh lesson (no progress) or resumed lesson
+      const hasProgress = lessonState.currentExerciseIndex > 0 || Object.keys(lessonState.answers).length > 0;
+      
+      if (hasProgress) {
+        console.log('🔄 Resuming lesson from saved state, exercise:', lessonState.currentExerciseIndex, 'answers:', Object.keys(lessonState.answers).length);
+        setCurrentScreen('lesson');
+      } else {
+        console.log('🆕 Fresh lesson start');
+        setCurrentScreen('start');
+      }
     }
-  }, [lessonState]);
+  }, [lessonState, currentScreen]);
 
   const handleStartLesson = () => {
     setCurrentScreen('lesson');

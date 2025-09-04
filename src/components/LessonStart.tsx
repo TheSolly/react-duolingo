@@ -9,7 +9,7 @@ interface LessonStartProps {
 }
 
 function LessonStart({ lesson, onStartLesson }: LessonStartProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { state: appState } = useAppContext();
 
   if (!lesson) {
@@ -27,7 +27,11 @@ function LessonStart({ lesson, onStartLesson }: LessonStartProps) {
     <div className="lesson-start">
       <div className="lesson-start-content">
         <div className="lesson-header">
-          <h1 className="lesson-title">{lesson.title}</h1>
+          <h1 className="lesson-title">
+            {i18n.language === 'es' && lesson.title_es 
+              ? lesson.title_es 
+              : lesson.title}
+          </h1>
           <div className="lesson-meta">
             <div className="estimated-time">
               <span className="time-icon">⏱</span>
@@ -58,7 +62,7 @@ function LessonStart({ lesson, onStartLesson }: LessonStartProps) {
           <div className="stat-item">
             <div className="stat-icon xp">⭐</div>
             <div className="stat-info">
-              <span className="stat-label">XP</span>
+              <span className="stat-label">{t('lesson.start.xp')}</span>
               <span className="stat-value">{appState.totalXP}</span>
             </div>
           </div>
@@ -67,14 +71,14 @@ function LessonStart({ lesson, onStartLesson }: LessonStartProps) {
         <div className="lesson-preview">
           <h3>{t('lesson.start.title')}</h3>
           <div className="exercise-count">
-            <span>{lesson.exercises.length} exercises</span>
+            <span>{lesson.exercises.length} {t('lesson.start.exercises')}</span>
           </div>
 
           <div className="exercise-types">
             {getUniqueExerciseTypes(lesson.exercises as ExerciseUnion[]).map((type, index) => (
               <div key={index} className={`exercise-type-badge ${type}`}>
                 {getExerciseTypeIcon(type)}
-                <span>{getExerciseTypeName(type)}</span>
+                <span>{getExerciseTypeName(type, t)}</span>
               </div>
             ))}
           </div>
@@ -89,8 +93,10 @@ function LessonStart({ lesson, onStartLesson }: LessonStartProps) {
         </button>
 
         <div id="lesson-description" className="lesson-description">
-          Complete {lesson.exercises.length} exercises to earn{' '}
-          {lesson.xp_per_correct * lesson.exercises.length} XP
+          {t('lesson.start.completionDescription', { 
+            count: lesson.exercises.length,
+            xp: lesson.xp_per_correct * lesson.exercises.length 
+          })}
         </div>
       </div>
     </div>
@@ -112,13 +118,13 @@ function getExerciseTypeIcon(type: string): string {
   return icons[type as keyof typeof icons] || '📚';
 }
 
-function getExerciseTypeName(type: string): string {
+function getExerciseTypeName(type: string, t: (key: string) => string): string {
   const names = {
-    multiple_choice: 'Multiple Choice',
-    type_answer: 'Type Answer',
-    word_bank: 'Word Bank',
-    match_pairs: 'Match Pairs',
-    listening_prompt: 'Listening',
+    multiple_choice: t('exercises.multipleChoice.name'),
+    type_answer: t('exercises.typeAnswer.name'),
+    word_bank: t('exercises.wordBank.name'),
+    match_pairs: t('exercises.matchPairs.name'),
+    listening_prompt: t('exercises.listeningPrompt.name'),
   };
   return names[type as keyof typeof names] || type;
 }

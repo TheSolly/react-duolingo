@@ -5,7 +5,10 @@
       "estimatedTime": "{{time}} min",
       "startButton": "Empezar Lección",
       "hearts": "Corazones",
-      "streak": "Racha"
+      "streak": "Racha",
+      "xp": "XP",
+      "exercises": "ejercicios",
+      "completionDescription": "Completa {{count}} ejercicios para ganar {{xp}} XP"
     },
     "exercise": {
       "submitAnswer": "Enviar",
@@ -27,7 +30,12 @@
       "xpEarned": "{{xp}} XP obtenidos",
       "streakIncrement": "Racha +{{streak}}",
       "restartLesson": "Reiniciar Lección",
-      "nextLesson": "Siguiente Lección"
+      "nextLesson": "Siguiente Lección",
+      "motivationalMessage": {
+        "excellent": "¡Excelente trabajo! Estás progresando muy bien.",
+        "good": "¡Buen trabajo! Sigue practicando para mejorar tu precisión.",
+        "keepPracticing": "¡Sigue practicando! Cada lección te ayuda a mejorar."
+      }
     },
     "progress": {
       "exercise": "Ejercicio {{current}} de {{total}}"
@@ -35,22 +43,29 @@
   },
   "exercises": {
     "multipleChoice": {
-      "instruction": "Selecciona la respuesta correcta"
+      "instruction": "Selecciona la respuesta correcta",
+      "name": "Opción Múltiple"
     },
     "typeAnswer": {
       "instruction": "Escribe la traducción",
-      "placeholder": "Escribe tu respuesta aquí..."
+      "placeholder": "Escribe tu respuesta aquí...",
+      "caseInsensitive": "No sensible a mayúsculas",
+      "spacesIgnored": "Se ignoran espacios",
+      "name": "Escribir Respuesta"
     },
     "wordBank": {
-      "instruction": "Toca las palabras para construir la oración"
+      "instruction": "Toca las palabras para construir la oración",
+      "name": "Banco de Palabras"
     },
     "matchPairs": {
-      "instruction": "Empareja haciendo clic en ellos"
+      "instruction": "Empareja haciendo clic en ellos",
+      "name": "Emparejar"
     },
     "listeningPrompt": {
       "instruction": "Escribe lo que escuchas",
       "audioNotAvailable": "Audio no disponible",
-      "playAudio": "Reproducir Audio"
+      "playAudio": "Reproducir Audio",
+      "name": "Escuchar"
     }
   },
   "common": {
@@ -61,6 +76,20 @@
     "next": "Siguiente",
     "done": "Hecho",
     "cancel": "Cancelar"
+  },
+  "hearts": {
+    "noHeartsLeft": "¡No quedan corazones!",
+    "noHeartsMessage": "Te has quedado sin corazones. ¡Sigue practicando para mejorar!",
+    "startOver": "Empezar de Nuevo"
+  },
+  "completion": {
+    "xpEarned": "XP Obtenidos",
+    "streak": "Racha",
+    "accuracy": "Precisión",
+    "lessonSummary": "Resumen de la Lección",
+    "exercisesCompleted": "Ejercicios Completados",
+    "correctAnswers": "Respuestas Correctas",
+    "totalXP": "XP Total"
   },
   "accessibility": {
     "heartsRemaining": "{{count}} corazones restantes",

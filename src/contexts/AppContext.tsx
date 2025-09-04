@@ -4,6 +4,7 @@ import {
   useReducer,
   ReactNode,
   useEffect,
+  useMemo,
 } from 'react';
 import { storageUtils } from '../utils/storage';
 
@@ -22,6 +23,10 @@ type AppAction =
   | {
       type: 'LOAD_USER_PREFERENCES';
       payload: { locale: string; totalStreak: number; totalXP: number };
+    }
+  | {
+      type: 'UPDATE_USER_STATS';
+      payload: { xpGained: number; streakIncrement: number };
     };
 
 const initialAppState: AppState = {
@@ -47,6 +52,12 @@ function appReducer(state: AppState, action: AppAction): AppState {
         totalStreak: action.payload.totalStreak,
         totalXP: action.payload.totalXP,
       };
+    case 'UPDATE_USER_STATS':
+      return {
+        ...state,
+        totalXP: state.totalXP + action.payload.xpGained,
+        totalStreak: state.totalStreak + action.payload.streakIncrement,
+      };
     default:
       return state;
   }
@@ -59,6 +70,7 @@ interface AppContextType {
     setLoading: (loading: boolean) => void;
     setError: (error: string | null) => void;
     loadUserPreferences: () => void;
+    updateUserStats: (xpGained: number, streakIncrement: number) => void;
   };
 }
 
@@ -83,7 +95,7 @@ export function AppProvider({ children }: AppProviderProps) {
     });
   }, []);
 
-  const actions = {
+  const actions = useMemo(() => ({
     setLocale: (locale: string) => {
       dispatch({ type: 'SET_LOCALE', payload: locale });
       const currentPrefs = storageUtils.loadUserPreferences();
@@ -109,7 +121,17 @@ export function AppProvider({ children }: AppProviderProps) {
         },
       });
     },
-  };
+
+    updateUserStats: (xpGained: number, streakIncrement: number) => {
+      // Update localStorage first
+      storageUtils.updateUserStats(xpGained, streakIncrement);
+      // Then update the context state
+      dispatch({
+        type: 'UPDATE_USER_STATS',
+        payload: { xpGained, streakIncrement },
+      });
+    },
+  }), []);
 
   return (
     <AppContext.Provider value={{ state, actions }}>

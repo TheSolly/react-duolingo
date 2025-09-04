@@ -1,5 +1,6 @@
 import { createContext, useContext, ReactNode } from 'react';
 import { useLessonState } from '../hooks/useLessonState';
+import { useAppContext } from './AppContext';
 import { LessonState, Lesson } from '../types';
 
 interface LessonContextType {
@@ -26,7 +27,8 @@ interface LessonProviderProps {
 }
 
 export function LessonProvider({ children }: LessonProviderProps) {
-  const lessonState = useLessonState();
+  const { actions: appActions } = useAppContext();
+  const lessonState = useLessonState(appActions.updateUserStats);
 
   return (
     <LessonContext.Provider value={lessonState}>

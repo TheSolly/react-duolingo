@@ -14,7 +14,7 @@ function MultipleChoice({
   onAnswerSubmit,
   disabled = false,
 }: MultipleChoiceProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedAnswer, setSelectedAnswer] = useState<string>('');
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
@@ -31,8 +31,12 @@ function MultipleChoice({
     setHasSubmitted(true);
   };
 
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' && selectedAnswer && !hasSubmitted) {
+
+  const handleChoiceKeyDown = (event: React.KeyboardEvent, choice: string) => {
+    if (event.key === ' ' || event.key === 'Spacebar') {
+      event.preventDefault(); // Prevent page scroll
+      setSelectedAnswer(choice);
+    } else if (event.key === 'Enter' && selectedAnswer && !hasSubmitted) {
       handleSubmit();
     }
   };
@@ -40,7 +44,11 @@ function MultipleChoice({
   return (
     <div className="exercise multiple-choice">
       <div className="exercise-header">
-        <h2 className="exercise-prompt">{exercise.prompt_en}</h2>
+        <h2 className="exercise-prompt">
+          {i18n.language === 'es' && exercise.prompt_es 
+            ? exercise.prompt_es 
+            : exercise.prompt_en}
+        </h2>
         <p className="exercise-instruction">
           {t('exercises.multipleChoice.instruction')}
         </p>
@@ -56,7 +64,7 @@ function MultipleChoice({
             <label
               key={index}
               className={`choice-item ${selectedAnswer === choice ? 'selected' : ''} ${disabled ? 'disabled' : ''}`}
-              onKeyDown={handleKeyDown}
+              onKeyDown={(e) => handleChoiceKeyDown(e, choice)}
               tabIndex={disabled ? -1 : 0}
             >
               <input

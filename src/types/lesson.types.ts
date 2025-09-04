@@ -1,6 +1,7 @@
 export interface Lesson {
   id: string;
   title: string;
+  title_es?: string;
   xp_per_correct: number;
   streak_increment: number;
   exercises: Exercise[];
@@ -10,7 +11,9 @@ export interface Exercise {
   id: string;
   type: ExerciseType;
   prompt_en: string;
+  prompt_es?: string;
   explanation_en: string;
+  explanation_es?: string;
 }
 
 export interface MultipleChoiceExercise extends Exercise {

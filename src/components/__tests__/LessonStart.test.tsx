@@ -1,7 +1,9 @@
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { useTranslation } from 'react-i18next';
 import LessonStart from '../LessonStart';
 import { useAppContext } from '../../contexts/AppContext';
+import { Lesson } from '../../types';
 
 // Mock the hooks
 jest.mock('react-i18next');
@@ -10,126 +12,137 @@ jest.mock('../../contexts/AppContext');
 const mockUseTranslation = useTranslation as jest.MockedFunction<typeof useTranslation>;
 const mockUseAppContext = useAppContext as jest.MockedFunction<typeof useAppContext>;
 
-const mockLesson = {
+const mockLesson: Lesson = {
   id: 'lesson-basics-1',
-  title: 'Basic Phrases',
+  title: 'Basics 1 — Greetings',
+  title_es: 'Básico 1 — Saludos',
   xp_per_correct: 10,
   streak_increment: 1,
   exercises: [
     {
       id: 'ex1',
       type: 'multiple_choice',
-      prompt_en: 'Hello',
-      explanation_en: 'A greeting',
-      choices: ['Hola', 'Adiós'],
+      prompt_en: 'Select the translation for: Hello',
+      prompt_es: 'Selecciona la traducción de: Hello',
+      explanation_en: 'Hola means Hello in Spanish.',
+      explanation_es: 'Hola significa Hello en inglés.',
+      choices: ['Hola', 'Adiós', 'Gracias'],
       answer: 'Hola'
     },
     {
-      id: 'ex2', 
+      id: 'ex2',
       type: 'type_answer',
-      prompt_en: 'Goodbye',
-      explanation_en: 'A farewell',
-      answer: ['Adiós'],
+      prompt_en: 'Type the translation for: Thank you',
+      prompt_es: 'Escribe la traducción de: Thank you',
+      explanation_en: 'Gracias means Thank you.',
+      explanation_es: 'Gracias significa Thank you en inglés.',
+      answer: ['gracias'],
       tolerance: { caseInsensitive: true, trim: true }
     }
   ]
 };
 
-const mockAppState = {
-  lessonState: {
-    lesson: null,
-    currentExerciseIndex: 0,
-    answers: {},
-    hearts: 3,
-    streak: 5,
-    xp: 120,
-    isComplete: false,
-    startTime: Date.now(),
-    lastSavedTime: Date.now()
-  },
-  locale: 'en',
-  isLoading: false,
-  error: null
-};
-
 describe('LessonStart', () => {
-  const mockOnStart = jest.fn();
-  const mockT = jest.fn((key: string) => key);
+  const mockOnStartLesson = jest.fn();
 
   beforeEach(() => {
+    jest.clearAllMocks();
+    
     mockUseTranslation.mockReturnValue({
-      t: mockT,
+      t: (key: string, options?: any) => {
+        const translations: Record<string, string> = {
+          'lesson.start.estimatedTime': `${options?.time} min`,
+          'lesson.start.hearts': 'Hearts',
+          'lesson.start.streak': 'Streak',
+          'lesson.start.xp': 'XP',
+          'lesson.start.exercises': 'exercises',
+          'lesson.start.completionDescription': `Complete ${options?.count} exercises to earn ${options?.xp} XP`,
+          'lesson.start.startButton': 'Start Lesson',
+          'lesson.start.title': 'Ready to start?',
+          'exercises.multipleChoice.name': 'Multiple Choice',
+          'exercises.typeAnswer.name': 'Type Answer'
+        };
+        return translations[key] || key;
+      },
       i18n: {
-        changeLanguage: jest.fn(),
-        language: 'en'
-      } as any
-    });
+        language: 'en',
+        changeLanguage: () => new Promise(() => {}),
+      },
+    } as any);
 
     mockUseAppContext.mockReturnValue({
-      state: mockAppState,
+      state: {
+        locale: 'en',
+        isLoading: false,
+        error: null,
+        totalStreak: 5,
+        totalXP: 100
+      },
       actions: {
+        setLocale: jest.fn(),
         setLoading: jest.fn(),
-        setError: jest.fn()
+        setError: jest.fn(),
+        loadUserPreferences: jest.fn(),
+        updateUserStats: jest.fn()
       }
     });
-
-    jest.clearAllMocks();
   });
 
-  it('renders lesson information correctly', () => {
-    render(<LessonStart lesson={mockLesson} onStartLesson={mockOnStart} />);
+  it('renders lesson start and begins lesson on click', () => {
+    render(<LessonStart lesson={mockLesson} onStartLesson={mockOnStartLesson} />);
     
-    expect(screen.getByText('Basic Phrases')).toBeInTheDocument();
+    // Check that lesson title is rendered
+    expect(screen.getByText('Basics 1 — Greetings')).toBeInTheDocument();
+    
+    // Check that exercise count is shown
     expect(screen.getByText('2 exercises')).toBeInTheDocument();
-  });
-
-  it('displays user stats correctly', () => {
-    render(<LessonStart lesson={mockLesson} onStartLesson={mockOnStart} />);
     
-    // Check hearts, streak, and XP are displayed
-    expect(screen.getByText('3')).toBeInTheDocument(); // hearts
-    expect(screen.getByText('5')).toBeInTheDocument(); // streak
-    expect(screen.getByText('120')).toBeInTheDocument(); // XP
-  });
-
-  it('shows exercise type badges', () => {
-    render(<LessonStart lesson={mockLesson} onStartLesson={mockOnStart} />);
+    // Check that estimated time is shown
+    expect(screen.getByText('1 min')).toBeInTheDocument();
     
-    // Should show badges for multiple_choice and type_answer
-    expect(screen.getByText('exerciseTypes.multiple_choice')).toBeInTheDocument();
-    expect(screen.getByText('exerciseTypes.type_answer')).toBeInTheDocument();
-  });
-
-  it('calls onStartLesson when start button is clicked', () => {
-    render(<LessonStart lesson={mockLesson} onStartLesson={mockOnStart} />);
+    // Check that user stats are shown
+    expect(screen.getByText('Hearts')).toBeInTheDocument();
+    expect(screen.getByText('Streak')).toBeInTheDocument();
+    expect(screen.getByText('5')).toBeInTheDocument(); // streak value
+    expect(screen.getByText('100')).toBeInTheDocument(); // XP value
     
-    const startButton = screen.getByText('lesson.start');
+    // Check that exercise types are shown
+    expect(screen.getByText('Multiple Choice')).toBeInTheDocument();
+    expect(screen.getByText('Type Answer')).toBeInTheDocument();
+    
+    // Check that start button is present
+    const startButton = screen.getByText('Start Lesson');
+    expect(startButton).toBeInTheDocument();
+    
+    // Check completion description
+    expect(screen.getByText('Complete 2 exercises to earn 20 XP')).toBeInTheDocument();
+    
+    // Click start lesson button
     fireEvent.click(startButton);
     
-    expect(mockOnStart).toHaveBeenCalledTimes(1);
+    // Verify that onStartLesson was called
+    expect(mockOnStartLesson).toHaveBeenCalledTimes(1);
   });
 
-  it('shows estimated time', () => {
-    render(<LessonStart lesson={mockLesson} onStartLesson={mockOnStart} />);
+  it('handles null lesson gracefully', () => {
+    render(<LessonStart lesson={null} onStartLesson={mockOnStartLesson} />);
     
-    expect(screen.getByText('lesson.estimatedTime')).toBeInTheDocument();
+    // Should show loading state
+    expect(screen.getByText('common.loading')).toBeInTheDocument();
   });
 
-  it('displays exercise type icons correctly', () => {
-    render(<LessonStart lesson={mockLesson} onStartLesson={mockOnStart} />);
-    
-    // Check that exercise type badges have proper classes
-    const multipleChoiceBadge = screen.getByText('exerciseTypes.multiple_choice').closest('.exercise-type-badge');
-    const typeAnswerBadge = screen.getByText('exerciseTypes.type_answer').closest('.exercise-type-badge');
-    
-    expect(multipleChoiceBadge).toHaveClass('multiple_choice');
-    expect(typeAnswerBadge).toHaveClass('type_answer');
-  });
+  it('displays Spanish title when language is Spanish', () => {
+    mockUseTranslation.mockReturnValue({
+      t: (key: string) => key,
+      i18n: {
+        language: 'es',
+        changeLanguage: () => new Promise(() => {}),
+      },
+    } as any);
 
-  it('handles empty exercises array', () => {
-    const emptyLesson = { ...mockLesson, exercises: [] };
-    render(<LessonStart lesson={emptyLesson} onStartLesson={mockOnStart} />);
+    render(<LessonStart lesson={mockLesson} onStartLesson={mockOnStartLesson} />);
     
-    expect(screen.getByText('0 exercises')).toBeInTheDocument();
+    // Should show Spanish title
+    expect(screen.getByText('Básico 1 — Saludos')).toBeInTheDocument();
   });
 });

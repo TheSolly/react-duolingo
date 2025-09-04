@@ -14,7 +14,7 @@ function ListeningPrompt({
   onAnswerSubmit,
   disabled = false,
 }: ListeningPromptProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [userInput, setUserInput] = useState('');
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -84,7 +84,11 @@ function ListeningPrompt({
   return (
     <div className="exercise listening-prompt">
       <div className="exercise-header">
-        <h2 className="exercise-prompt">{exercise.prompt_en}</h2>
+        <h2 className="exercise-prompt">
+          {i18n.language === 'es' && exercise.prompt_es 
+            ? exercise.prompt_es 
+            : exercise.prompt_en}
+        </h2>
         <p className="exercise-instruction">
           {t('exercises.listeningPrompt.instruction')}
         </p>

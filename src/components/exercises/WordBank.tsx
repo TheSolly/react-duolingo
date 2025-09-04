@@ -14,7 +14,7 @@ function WordBank({
   onAnswerSubmit,
   disabled = false,
 }: WordBankProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedWords, setSelectedWords] = useState<string[]>([]);
   const [availableWords, setAvailableWords] = useState<string[]>([]);
   const [hasSubmitted, setHasSubmitted] = useState(false);
@@ -68,7 +68,11 @@ function WordBank({
   return (
     <div className="exercise word-bank">
       <div className="exercise-header">
-        <h2 className="exercise-prompt">{exercise.prompt_en}</h2>
+        <h2 className="exercise-prompt">
+          {i18n.language === 'es' && exercise.prompt_es 
+            ? exercise.prompt_es 
+            : exercise.prompt_en}
+        </h2>
         <p className="exercise-instruction">
           {t('exercises.wordBank.instruction')}
         </p>
