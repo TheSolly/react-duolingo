@@ -12,7 +12,7 @@ function ProgressBar({
   className = '',
 }: ProgressBarProps) {
   const { t } = useTranslation();
-  const progressPercentage = (currentExercise / totalExercises) * 100;
+  const progressPercentage = totalExercises === 0 ? 0 : (currentExercise / totalExercises) * 100;
 
   return (
     <div className={`progress-bar-container ${className}`}>

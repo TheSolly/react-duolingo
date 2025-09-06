@@ -12,15 +12,24 @@ function CompletionScreen({ onRestartLesson }: CompletionScreenProps) {
   const { state: lessonState } = useLessonContext();
   const { state: appState } = useAppContext();
   const [showCelebration, setShowCelebration] = useState(false);
+  const [showContent, setShowContent] = useState(false);
+  const [showStats, setShowStats] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
+  const [showActions, setShowActions] = useState(false);
 
   useEffect(() => {
+    // Staggered animation sequence
     setShowCelebration(true);
+    
+    const timeouts = [
+      setTimeout(() => setShowContent(true), 300),
+      setTimeout(() => setShowStats(true), 800),
+      setTimeout(() => setShowSummary(true), 1200),
+      setTimeout(() => setShowActions(true), 1600),
+      setTimeout(() => setShowCelebration(false), 4000)
+    ];
 
-    const timer = setTimeout(() => {
-      setShowCelebration(false);
-    }, 3000);
-
-    return () => clearTimeout(timer);
+    return () => timeouts.forEach(clearTimeout);
   }, []);
 
   const { lesson, xp } = lessonState;
@@ -40,15 +49,23 @@ function CompletionScreen({ onRestartLesson }: CompletionScreenProps) {
       {showCelebration && (
         <div className="celebration-overlay">
           <div className="confetti-container">
-            {Array.from({ length: 50 }, (_, i) => (
-              <div key={i} className={`confetti confetti-${i % 5}`} />
+            {Array.from({ length: 80 }, (_, i) => (
+              <div 
+                key={i} 
+                className={`confetti confetti-${i % 6}`}
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  animationDelay: `${Math.random() * 3}s`,
+                  animationDuration: `${2 + Math.random() * 2}s`
+                }}
+              />
             ))}
           </div>
         </div>
       )}
 
-      <div className="completion-content">
-        <div className="completion-header">
+      <div className={`completion-content ${showContent ? 'content-enter' : 'content-enter-prepare'}`}>
+        <div className={`completion-header ${showContent ? 'header-enter' : ''}`}>
           <div className="completion-icon">🎉</div>
           <h1 className="completion-title">
             {t('lesson.completion.congratulations')}
@@ -58,8 +75,8 @@ function CompletionScreen({ onRestartLesson }: CompletionScreenProps) {
           </h2>
         </div>
 
-        <div className="completion-stats">
-          <div className="stat-card primary">
+        <div className={`completion-stats ${showStats ? 'stats-enter' : ''}`}>
+          <div className={`stat-card primary ${showStats ? 'stat-card-enter stat-card-enter-1' : ''}`}>
             <div className="stat-icon">⭐</div>
             <div className="stat-content">
               <span className="stat-label">{t('completion.xpEarned')}</span>
@@ -67,7 +84,7 @@ function CompletionScreen({ onRestartLesson }: CompletionScreenProps) {
             </div>
           </div>
 
-          <div className="stat-card secondary">
+          <div className={`stat-card secondary ${showStats ? 'stat-card-enter stat-card-enter-2' : ''}`}>
             <div className="stat-icon">🔥</div>
             <div className="stat-content">
               <span className="stat-label">{t('completion.streak')}</span>
@@ -75,7 +92,7 @@ function CompletionScreen({ onRestartLesson }: CompletionScreenProps) {
             </div>
           </div>
 
-          <div className="stat-card secondary">
+          <div className={`stat-card secondary ${showStats ? 'stat-card-enter stat-card-enter-3' : ''}`}>
             <div className="stat-icon">🎯</div>
             <div className="stat-content">
               <span className="stat-label">{t('completion.accuracy')}</span>
@@ -84,7 +101,7 @@ function CompletionScreen({ onRestartLesson }: CompletionScreenProps) {
           </div>
         </div>
 
-        <div className="completion-summary">
+        <div className={`completion-summary ${showSummary ? 'summary-enter' : ''}`}>
           <h3>{t('completion.lessonSummary')}</h3>
           <div className="summary-grid">
             <div className="summary-item">
@@ -104,7 +121,7 @@ function CompletionScreen({ onRestartLesson }: CompletionScreenProps) {
           </div>
         </div>
 
-        <div className="completion-actions">
+        <div className={`completion-actions ${showActions ? 'actions-enter' : ''}`}>
           <button onClick={onRestartLesson} className="restart-button">
             {t('lesson.completion.restartLesson')}
           </button>
@@ -118,7 +135,7 @@ function CompletionScreen({ onRestartLesson }: CompletionScreenProps) {
           </button>
         </div>
 
-        <div className="motivational-message">
+        <div className={`motivational-message ${showActions ? 'message-enter' : ''}`}>
           <p>
             {accuracy >= 80
               ? t('lesson.completion.motivationalMessage.excellent')

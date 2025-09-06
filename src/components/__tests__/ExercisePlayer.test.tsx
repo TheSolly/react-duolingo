@@ -6,15 +6,32 @@ import { useLessonContext } from '../../contexts/LessonContext';
 // Mock the hooks and components
 jest.mock('react-i18next');
 jest.mock('../../contexts/LessonContext');
-jest.mock('../ProgressBar', () => ({ progress }: { progress: number }) => 
-  <div data-testid="progress-bar">Progress: {progress}%</div>
-);
-jest.mock('../StreakHearts', () => ({ hearts, streak }: { hearts: number; streak: number }) => 
-  <div data-testid="streak-hearts">Hearts: {hearts}, Streak: {streak}</div>
-);
-jest.mock('../FeedbackBanner', () => ({ feedback }: { feedback: any }) => 
-  <div data-testid="feedback-banner">Feedback: {feedback.type}</div>
-);
+jest.mock('../ProgressBar', () => {
+  const MockProgressBar = ({ currentExercise, totalExercises }: { currentExercise: number; totalExercises: number }) => {
+    const progress = totalExercises === 0 ? 0 : Math.round((currentExercise / totalExercises) * 100);
+    return <div data-testid="progress-bar">Progress: {progress}%</div>;
+  };
+  return { __esModule: true, default: MockProgressBar };
+});
+jest.mock('../StreakHearts', () => {
+  const MockStreakHearts = ({ hearts, streak }: { hearts: number; streak: number }) => {
+    return <div data-testid="streak-hearts">Hearts: {hearts}, Streak: {streak}</div>;
+  };
+  return { __esModule: true, default: MockStreakHearts };
+});
+jest.mock('../FeedbackBanner', () => {
+  const MockFeedbackBanner = ({ feedback, onContinue }: { feedback: any; onContinue?: () => void }) => {
+    return (
+      <div data-testid="feedback-banner">
+        Feedback: {feedback.type}
+        {onContinue && feedback.type !== 'none' && (
+          <button onClick={onContinue}>lesson.exercise.continue</button>
+        )}
+      </div>
+    );
+  };
+  return { __esModule: true, default: MockFeedbackBanner };
+});
 
 const mockUseTranslation = useTranslation as jest.MockedFunction<typeof useTranslation>;
 const mockUseLessonContext = useLessonContext as jest.MockedFunction<typeof useLessonContext>;
@@ -119,7 +136,7 @@ describe('ExercisePlayer', () => {
     const correctOption = screen.getByDisplayValue('Hola');
     fireEvent.click(correctOption);
     
-    const submitButton = screen.getByText('exercise.submit');
+    const submitButton = screen.getByText('lesson.exercise.checkAnswer');
     fireEvent.click(submitButton);
     
     await waitFor(() => {
@@ -134,7 +151,7 @@ describe('ExercisePlayer', () => {
     const correctOption = screen.getByDisplayValue('Hola');
     fireEvent.click(correctOption);
     
-    const submitButton = screen.getByText('exercise.submit');
+    const submitButton = screen.getByText('lesson.exercise.checkAnswer');
     fireEvent.click(submitButton);
     
     await waitFor(() => {
@@ -150,11 +167,11 @@ describe('ExercisePlayer', () => {
     const correctOption = screen.getByDisplayValue('Hola');
     fireEvent.click(correctOption);
     
-    const submitButton = screen.getByText('exercise.submit');
+    const submitButton = screen.getByText('lesson.exercise.checkAnswer');
     fireEvent.click(submitButton);
     
     await waitFor(() => {
-      const continueButton = screen.getByText('exercise.continue');
+      const continueButton = screen.getByText('lesson.exercise.continue');
       fireEvent.click(continueButton);
       
       expect(mockNextExercise).toHaveBeenCalledTimes(1);
@@ -217,7 +234,7 @@ describe('ExercisePlayer', () => {
     const incorrectOption = screen.getByDisplayValue('Adiós');
     fireEvent.click(incorrectOption);
     
-    const submitButton = screen.getByText('exercise.submit');
+    const submitButton = screen.getByText('lesson.exercise.checkAnswer');
     fireEvent.click(submitButton);
     
     await waitFor(() => {

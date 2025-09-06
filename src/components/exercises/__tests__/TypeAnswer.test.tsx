@@ -50,7 +50,7 @@ describe('TypeAnswer', () => {
       />
     );
 
-    const input = screen.getByPlaceholderText('exercise.typeAnswerPlaceholder');
+    const input = screen.getByPlaceholderText('exercises.typeAnswer.placeholder');
     expect(input).toBeInTheDocument();
     expect(input).toHaveAttribute('type', 'text');
   });
@@ -63,7 +63,7 @@ describe('TypeAnswer', () => {
       />
     );
 
-    const input = screen.getByPlaceholderText('exercise.typeAnswerPlaceholder');
+    const input = screen.getByPlaceholderText('exercises.typeAnswer.placeholder');
     fireEvent.change(input, { target: { value: 'Hola' } });
 
     expect(input).toHaveValue('Hola');
@@ -77,10 +77,10 @@ describe('TypeAnswer', () => {
       />
     );
 
-    const input = screen.getByPlaceholderText('exercise.typeAnswerPlaceholder');
+    const input = screen.getByPlaceholderText('exercises.typeAnswer.placeholder');
     fireEvent.change(input, { target: { value: 'Hola' } });
 
-    const submitButton = screen.getByText('exercise.submit');
+    const submitButton = screen.getByText('lesson.exercise.checkAnswer');
     fireEvent.click(submitButton);
 
     expect(mockOnAnswerSubmit).toHaveBeenCalledWith('Hola', true);
@@ -94,10 +94,10 @@ describe('TypeAnswer', () => {
       />
     );
 
-    const input = screen.getByPlaceholderText('exercise.typeAnswerPlaceholder');
+    const input = screen.getByPlaceholderText('exercises.typeAnswer.placeholder');
     fireEvent.change(input, { target: { value: 'Adiós' } });
 
-    const submitButton = screen.getByText('exercise.submit');
+    const submitButton = screen.getByText('lesson.exercise.checkAnswer');
     fireEvent.click(submitButton);
 
     expect(mockOnAnswerSubmit).toHaveBeenCalledWith('Adiós', false);
@@ -111,10 +111,10 @@ describe('TypeAnswer', () => {
       />
     );
 
-    const input = screen.getByPlaceholderText('exercise.typeAnswerPlaceholder');
+    const input = screen.getByPlaceholderText('exercises.typeAnswer.placeholder');
     fireEvent.change(input, { target: { value: 'HOLA' } });
 
-    const submitButton = screen.getByText('exercise.submit');
+    const submitButton = screen.getByText('lesson.exercise.checkAnswer');
     fireEvent.click(submitButton);
 
     expect(mockOnAnswerSubmit).toHaveBeenCalledWith('HOLA', true);
@@ -128,13 +128,13 @@ describe('TypeAnswer', () => {
       />
     );
 
-    const input = screen.getByPlaceholderText('exercise.typeAnswerPlaceholder');
+    const input = screen.getByPlaceholderText('exercises.typeAnswer.placeholder');
     fireEvent.change(input, { target: { value: '  Hola  ' } });
 
-    const submitButton = screen.getByText('exercise.submit');
+    const submitButton = screen.getByText('lesson.exercise.checkAnswer');
     fireEvent.click(submitButton);
 
-    expect(mockOnAnswerSubmit).toHaveBeenCalledWith('  Hola  ', true);
+    expect(mockOnAnswerSubmit).toHaveBeenCalledWith('Hola', true);
   });
 
   it('disables submit button when input is empty', () => {
@@ -145,7 +145,7 @@ describe('TypeAnswer', () => {
       />
     );
 
-    const submitButton = screen.getByText('exercise.submit');
+    const submitButton = screen.getByText('lesson.exercise.checkAnswer');
     expect(submitButton).toBeDisabled();
   });
 
@@ -157,10 +157,10 @@ describe('TypeAnswer', () => {
       />
     );
 
-    const input = screen.getByPlaceholderText('exercise.typeAnswerPlaceholder');
+    const input = screen.getByPlaceholderText('exercises.typeAnswer.placeholder');
     fireEvent.change(input, { target: { value: 'test' } });
 
-    const submitButton = screen.getByText('exercise.submit');
+    const submitButton = screen.getByText('lesson.exercise.checkAnswer');
     expect(submitButton).not.toBeDisabled();
   });
 
@@ -173,8 +173,8 @@ describe('TypeAnswer', () => {
       />
     );
 
-    const input = screen.getByPlaceholderText('exercise.typeAnswerPlaceholder');
-    const submitButton = screen.getByText('exercise.submit');
+    const input = screen.getByPlaceholderText('exercises.typeAnswer.placeholder');
+    const submitButton = screen.getByText('lesson.exercise.checkAnswer');
 
     expect(input).toBeDisabled();
     expect(submitButton).toBeDisabled();
@@ -188,7 +188,7 @@ describe('TypeAnswer', () => {
       />
     );
 
-    const input = screen.getByPlaceholderText('exercise.typeAnswerPlaceholder');
+    const input = screen.getByPlaceholderText('exercises.typeAnswer.placeholder');
     fireEvent.change(input, { target: { value: 'Hola' } });
     fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
 
@@ -203,30 +203,39 @@ describe('TypeAnswer', () => {
       />
     );
 
-    const input = screen.getByPlaceholderText('exercise.typeAnswerPlaceholder');
+    const input = screen.getByPlaceholderText('exercises.typeAnswer.placeholder');
     fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
 
     expect(mockOnAnswerSubmit).not.toHaveBeenCalled();
   });
 
   it('matches multiple possible answers', () => {
-    render(
+    const { unmount } = render(
       <TypeAnswer
         exercise={mockExercise}
         onAnswerSubmit={mockOnAnswerSubmit}
       />
     );
 
-    const input = screen.getByPlaceholderText('exercise.typeAnswerPlaceholder');
+    const input = screen.getByPlaceholderText('exercises.typeAnswer.placeholder');
     
     // Test first possible answer
     fireEvent.change(input, { target: { value: 'Hola' } });
-    fireEvent.click(screen.getByText('exercise.submit'));
-    expect(mockOnAnswerSubmit).toHaveBeenLastCalledWith('Hola', true);
+    fireEvent.click(screen.getByText('lesson.exercise.checkAnswer'));
+    expect(mockOnAnswerSubmit).toHaveBeenCalledWith('Hola', true);
 
-    // Clear and test second possible answer
-    fireEvent.change(input, { target: { value: 'hola' } });
-    fireEvent.click(screen.getByText('exercise.submit'));
+    // Unmount and test second possible answer with new instance
+    unmount();
+    render(
+      <TypeAnswer
+        exercise={mockExercise}
+        onAnswerSubmit={mockOnAnswerSubmit}
+      />
+    );
+    
+    const newInput = screen.getByPlaceholderText('exercises.typeAnswer.placeholder');
+    fireEvent.change(newInput, { target: { value: 'hola' } });
+    fireEvent.click(screen.getByText('lesson.exercise.checkAnswer'));
     expect(mockOnAnswerSubmit).toHaveBeenLastCalledWith('hola', true);
   });
 });

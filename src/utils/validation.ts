@@ -21,7 +21,12 @@ export function normalizeText(
 
   if (options.removeAccents) {
     // Remove common accents and diacritics
-    normalized = normalized.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    normalized = normalized
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      // Additional Spanish-specific normalizations
+      .replace(/ñ/g, 'n')
+      .replace(/Ñ/g, 'N');
   }
 
   // Replace multiple whitespace with single space
@@ -69,7 +74,12 @@ export function validateWordBankAnswer(
   }
 
   return userAnswer.every(
-    (word, index) => normalizeText(word) === normalizeText(correctAnswer[index])
+    (word, index) =>
+      normalizeText(word, { caseInsensitive: false, trim: true }) ===
+      normalizeText(correctAnswer[index], {
+        caseInsensitive: false,
+        trim: true,
+      })
   );
 }
 
@@ -87,8 +97,22 @@ export function validateMatchPairs(
   return userMatches.every((userMatch) =>
     correctPairs.some(
       (correctPair) =>
-        normalizeText(userMatch.left) === normalizeText(correctPair.left) &&
-        normalizeText(userMatch.right) === normalizeText(correctPair.right)
+        normalizeText(userMatch.left, {
+          caseInsensitive: false,
+          trim: true,
+        }) ===
+          normalizeText(correctPair.left, {
+            caseInsensitive: false,
+            trim: true,
+          }) &&
+        normalizeText(userMatch.right, {
+          caseInsensitive: false,
+          trim: true,
+        }) ===
+          normalizeText(correctPair.right, {
+            caseInsensitive: false,
+            trim: true,
+          })
     )
   );
 }
@@ -100,7 +124,70 @@ export function validateMultipleChoice(
   userAnswer: string,
   correctAnswer: string
 ): boolean {
-  return normalizeText(userAnswer) === normalizeText(correctAnswer);
+  return (
+    normalizeText(userAnswer, { caseInsensitive: false, trim: true }) ===
+    normalizeText(correctAnswer, { caseInsensitive: false, trim: true })
+  );
+}
+
+/**
+ * Gets helpful feedback for incorrect answers
+ */
+export function getValidationFeedback(
+  userAnswer: string,
+  correctAnswers: string[],
+  tolerance?: { caseInsensitive: boolean; trim: boolean }
+): { isClose: boolean; suggestion?: string; hint?: string } {
+  const normalizedUserAnswer = normalizeText(userAnswer, {
+    caseInsensitive: tolerance?.caseInsensitive ?? true,
+    trim: tolerance?.trim ?? true,
+    removeAccents: true,
+  });
+
+  // Check if it's just a case/whitespace/accent issue
+  const exactMatch = correctAnswers.find(answer => {
+    const normalizedAnswer = normalizeText(answer, {
+      caseInsensitive: false,
+      trim: false,
+      removeAccents: false,
+    });
+    return normalizedAnswer.toLowerCase().trim() === userAnswer.toLowerCase().trim();
+  });
+
+  if (exactMatch && exactMatch !== userAnswer) {
+    return {
+      isClose: true,
+      suggestion: exactMatch,
+      hint: "Watch your capitalization and spacing!"
+    };
+  }
+
+  // Check similarity to find close matches
+  let closestAnswer = '';
+  let highestSimilarity = 0;
+
+  for (const answer of correctAnswers) {
+    const similarity = calculateSimilarity(normalizedUserAnswer, normalizeText(answer, {
+      caseInsensitive: tolerance?.caseInsensitive ?? true,
+      trim: tolerance?.trim ?? true,
+      removeAccents: true,
+    }));
+    
+    if (similarity > highestSimilarity) {
+      highestSimilarity = similarity;
+      closestAnswer = answer;
+    }
+  }
+
+  if (highestSimilarity > 0.7) {
+    return {
+      isClose: true,
+      suggestion: closestAnswer,
+      hint: "You're very close! Check your spelling."
+    };
+  }
+
+  return { isClose: false };
 }
 
 /**

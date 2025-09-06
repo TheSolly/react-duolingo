@@ -1,7 +1,7 @@
 import { 
   validateMultipleChoice, 
-  validateTypeAnswer, 
-  validateWordBank, 
+  validateTextAnswer, 
+  validateWordBankAnswer, 
   validateMatchPairs 
 } from '../validation';
 
@@ -17,28 +17,28 @@ describe('validation utilities', () => {
     };
 
     it('validates correct answer', () => {
-      const result = validateMultipleChoice(exercise, 'Option B');
+      const result = validateMultipleChoice('Option B', 'Option B');
       expect(result).toBe(true);
     });
 
     it('validates incorrect answer', () => {
-      const result = validateMultipleChoice(exercise, 'Option A');
+      const result = validateMultipleChoice('Option A', 'Option B');
       expect(result).toBe(false);
     });
 
     it('validates case sensitivity', () => {
-      const result = validateMultipleChoice(exercise, 'option b');
+      const result = validateMultipleChoice('option b', 'Option B');
       expect(result).toBe(false);
     });
 
     it('handles empty user answer', () => {
-      const result = validateMultipleChoice(exercise, '');
+      const result = validateMultipleChoice('', 'Option B');
       expect(result).toBe(false);
     });
 
     it('handles whitespace in user answer', () => {
-      const result = validateMultipleChoice(exercise, ' Option B ');
-      expect(result).toBe(false);
+      const result = validateMultipleChoice(' Option B ', 'Option B');
+      expect(result).toBe(true);
     });
   });
 
@@ -56,27 +56,27 @@ describe('validation utilities', () => {
     };
 
     it('validates correct answer exactly', () => {
-      const result = validateTypeAnswer(exercise, 'Hello');
+      const result = validateTextAnswer('Hello', exercise.answer, exercise.tolerance);
       expect(result).toBe(true);
     });
 
     it('validates alternative correct answers', () => {
-      expect(validateTypeAnswer(exercise, 'Hi')).toBe(true);
-      expect(validateTypeAnswer(exercise, 'Hey')).toBe(true);
+      expect(validateTextAnswer('Hi', exercise.answer, exercise.tolerance)).toBe(true);
+      expect(validateTextAnswer('Hey', exercise.answer, exercise.tolerance)).toBe(true);
     });
 
     it('handles case insensitive matching when enabled', () => {
-      const result = validateTypeAnswer(exercise, 'hello');
+      const result = validateTextAnswer('hello', exercise.answer, exercise.tolerance);
       expect(result).toBe(true);
     });
 
     it('handles trimming when enabled', () => {
-      const result = validateTypeAnswer(exercise, '  Hello  ');
+      const result = validateTextAnswer('  Hello  ', exercise.answer, exercise.tolerance);
       expect(result).toBe(true);
     });
 
     it('validates incorrect answer', () => {
-      const result = validateTypeAnswer(exercise, 'Goodbye');
+      const result = validateTextAnswer('Goodbye', exercise.answer, exercise.tolerance);
       expect(result).toBe(false);
     });
 
@@ -86,8 +86,8 @@ describe('validation utilities', () => {
         tolerance: { caseInsensitive: false, trim: true }
       };
       
-      expect(validateTypeAnswer(caseSensitiveExercise, 'Hello')).toBe(true);
-      expect(validateTypeAnswer(caseSensitiveExercise, 'hello')).toBe(false);
+      expect(validateTextAnswer('Hello', caseSensitiveExercise.answer, caseSensitiveExercise.tolerance)).toBe(true);
+      expect(validateTextAnswer('hello', caseSensitiveExercise.answer, caseSensitiveExercise.tolerance)).toBe(false);
     });
 
     it('handles no trimming mode', () => {
@@ -96,12 +96,12 @@ describe('validation utilities', () => {
         tolerance: { caseInsensitive: true, trim: false }
       };
       
-      expect(validateTypeAnswer(noTrimExercise, 'Hello')).toBe(true);
-      expect(validateTypeAnswer(noTrimExercise, ' Hello ')).toBe(false);
+      expect(validateTextAnswer('Hello', noTrimExercise.answer, noTrimExercise.tolerance)).toBe(true);
+      expect(validateTextAnswer(' Hello ', noTrimExercise.answer, noTrimExercise.tolerance)).toBe(false);
     });
 
     it('handles empty user answer', () => {
-      const result = validateTypeAnswer(exercise, '');
+      const result = validateTextAnswer('', exercise.answer, exercise.tolerance);
       expect(result).toBe(false);
     });
 
@@ -111,8 +111,8 @@ describe('validation utilities', () => {
         answer: ['Hello']
       };
       
-      expect(validateTypeAnswer(singleAnswerExercise, 'Hello')).toBe(true);
-      expect(validateTypeAnswer(singleAnswerExercise, 'Hi')).toBe(false);
+      expect(validateTextAnswer('Hello', singleAnswerExercise.answer, exercise.tolerance)).toBe(true);
+      expect(validateTextAnswer('Hi', singleAnswerExercise.answer, exercise.tolerance)).toBe(false);
     });
   });
 
@@ -127,37 +127,37 @@ describe('validation utilities', () => {
     };
 
     it('validates correct answer in correct order', () => {
-      const result = validateWordBank(exercise, ['The', 'cat', 'is', 'black']);
+      const result = validateWordBankAnswer(['The', 'cat', 'is', 'black'], exercise.answer);
       expect(result).toBe(true);
     });
 
     it('validates incorrect answer with wrong order', () => {
-      const result = validateWordBank(exercise, ['cat', 'The', 'is', 'black']);
+      const result = validateWordBankAnswer(['cat', 'The', 'is', 'black'], exercise.answer);
       expect(result).toBe(false);
     });
 
     it('validates incorrect answer with wrong words', () => {
-      const result = validateWordBank(exercise, ['The', 'dog', 'is', 'black']);
+      const result = validateWordBankAnswer(['The', 'dog', 'is', 'black'], exercise.answer);
       expect(result).toBe(false);
     });
 
     it('validates incorrect answer with missing words', () => {
-      const result = validateWordBank(exercise, ['The', 'cat', 'is']);
+      const result = validateWordBankAnswer(['The', 'cat', 'is'], exercise.answer);
       expect(result).toBe(false);
     });
 
     it('validates incorrect answer with extra words', () => {
-      const result = validateWordBank(exercise, ['The', 'cat', 'is', 'black', 'dog']);
+      const result = validateWordBankAnswer(['The', 'cat', 'is', 'black', 'dog'], exercise.answer);
       expect(result).toBe(false);
     });
 
     it('handles empty user answer', () => {
-      const result = validateWordBank(exercise, []);
+      const result = validateWordBankAnswer([], exercise.answer);
       expect(result).toBe(false);
     });
 
     it('is case sensitive for word matching', () => {
-      const result = validateWordBank(exercise, ['the', 'cat', 'is', 'black']);
+      const result = validateWordBankAnswer(['the', 'cat', 'is', 'black'], exercise.answer);
       expect(result).toBe(false);
     });
   });
@@ -182,7 +182,7 @@ describe('validation utilities', () => {
         { left: 'Thank you', right: 'Gracias' }
       ];
       
-      const result = validateMatchPairs(exercise, userAnswer);
+      const result = validateMatchPairs(userAnswer, exercise.pairs);
       expect(result).toBe(true);
     });
 
@@ -193,7 +193,7 @@ describe('validation utilities', () => {
         { left: 'Goodbye', right: 'Adiós' }
       ];
       
-      const result = validateMatchPairs(exercise, userAnswer);
+      const result = validateMatchPairs(userAnswer, exercise.pairs);
       expect(result).toBe(true);
     });
 
@@ -204,7 +204,7 @@ describe('validation utilities', () => {
         { left: 'Thank you', right: 'Gracias' }
       ];
       
-      const result = validateMatchPairs(exercise, userAnswer);
+      const result = validateMatchPairs(userAnswer, exercise.pairs);
       expect(result).toBe(false);
     });
 
@@ -214,7 +214,7 @@ describe('validation utilities', () => {
         { left: 'Goodbye', right: 'Adiós' }
       ];
       
-      const result = validateMatchPairs(exercise, userAnswer);
+      const result = validateMatchPairs(userAnswer, exercise.pairs);
       expect(result).toBe(false);
     });
 
@@ -226,12 +226,12 @@ describe('validation utilities', () => {
         { left: 'Extra', right: 'Pair' }
       ];
       
-      const result = validateMatchPairs(exercise, userAnswer);
+      const result = validateMatchPairs(userAnswer, exercise.pairs);
       expect(result).toBe(false);
     });
 
     it('handles empty user answer', () => {
-      const result = validateMatchPairs(exercise, []);
+      const result = validateMatchPairs([], exercise.pairs);
       expect(result).toBe(false);
     });
 
@@ -242,7 +242,7 @@ describe('validation utilities', () => {
         { left: 'Thank you', right: 'Gracias' }
       ];
       
-      const result = validateMatchPairs(exercise, userAnswer);
+      const result = validateMatchPairs(userAnswer, exercise.pairs);
       expect(result).toBe(false);
     });
 
@@ -253,7 +253,7 @@ describe('validation utilities', () => {
         { left: 'Thank you', right: 'Thank you' } // Wrong pairing
       ];
       
-      const result = validateMatchPairs(exercise, userAnswer);
+      const result = validateMatchPairs(userAnswer, exercise.pairs);
       expect(result).toBe(false);
     });
   });

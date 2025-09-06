@@ -45,7 +45,7 @@ describe('ProgressBar', () => {
   it('calculates progress percentage correctly', () => {
     render(<ProgressBar currentExercise={2} totalExercises={5} />);
     
-    const progressFill = screen.getByClassName('progress-bar-fill');
+    const progressFill = document.querySelector('.progress-bar-fill') as HTMLElement;
     expect(progressFill).toHaveStyle('width: 40%'); // 2/5 = 40%
   });
 
@@ -96,14 +96,14 @@ describe('ProgressBar', () => {
     const progressBar = screen.getByRole('progressbar');
     expect(progressBar).toHaveAttribute('aria-valuemax', '0');
     
-    const progressFill = screen.getByClassName('progress-bar-fill');
+    const progressFill = document.querySelector('.progress-bar-fill') as HTMLElement;
     expect(progressFill).toHaveStyle('width: 0%'); // Should handle division by zero
   });
 
   it('shows 100% progress when all exercises completed', () => {
     render(<ProgressBar currentExercise={5} totalExercises={5} />);
     
-    const progressFill = screen.getByClassName('progress-bar-fill');
+    const progressFill = document.querySelector('.progress-bar-fill') as HTMLElement;
     expect(progressFill).toHaveStyle('width: 100%');
     
     const steps = screen.getAllByClassName('progress-step');

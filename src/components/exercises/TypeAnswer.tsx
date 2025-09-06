@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TypeAnswerExercise } from '../../types';
-import { validateTextAnswer } from '../../utils/validation';
+import { validateTextAnswer, getValidationFeedback } from '../../utils/validation';
 
 interface TypeAnswerProps {
   exercise: TypeAnswerExercise;
@@ -17,11 +17,13 @@ function TypeAnswer({
   const { t, i18n } = useTranslation();
   const [userInput, setUserInput] = useState('');
   const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [feedback, setFeedback] = useState<{ isClose: boolean; suggestion?: string; hint?: string } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setUserInput('');
     setHasSubmitted(false);
+    setFeedback(null);
     if (inputRef.current && !disabled) {
       inputRef.current.focus();
     }
@@ -35,6 +37,17 @@ function TypeAnswer({
       exercise.answer,
       exercise.tolerance
     );
+    
+    // Get feedback for wrong answers
+    if (!isCorrect) {
+      const validationFeedback = getValidationFeedback(
+        userInput,
+        exercise.answer,
+        exercise.tolerance
+      );
+      setFeedback(validationFeedback);
+    }
+    
     onAnswerSubmit(userInput.trim(), isCorrect);
     setHasSubmitted(true);
   };
@@ -118,6 +131,16 @@ function TypeAnswer({
 
         {hasSubmitted && (
           <div className="answer-feedback">
+            {feedback && feedback.isClose && (
+              <div className="feedback-hint">
+                <p className="hint-text">{feedback.hint}</p>
+                {feedback.suggestion && (
+                  <p className="suggestion">
+                    <strong>Try:</strong> "{feedback.suggestion}"
+                  </p>
+                )}
+              </div>
+            )}
             <div className="correct-answers">
               <h4>Accepted answers:</h4>
               <ul>

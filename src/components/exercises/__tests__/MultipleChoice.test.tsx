@@ -78,7 +78,7 @@ describe('MultipleChoice', () => {
     const holaOption = screen.getByDisplayValue('Hola');
     fireEvent.click(holaOption);
 
-    const submitButton = screen.getByText('exercise.submit');
+    const submitButton = screen.getByText('lesson.exercise.checkAnswer');
     fireEvent.click(submitButton);
 
     expect(mockOnAnswerSubmit).toHaveBeenCalledWith('Hola', true);
@@ -95,7 +95,7 @@ describe('MultipleChoice', () => {
     const wrongOption = screen.getByDisplayValue('Adiós');
     fireEvent.click(wrongOption);
 
-    const submitButton = screen.getByText('exercise.submit');
+    const submitButton = screen.getByText('lesson.exercise.checkAnswer');
     fireEvent.click(submitButton);
 
     expect(mockOnAnswerSubmit).toHaveBeenCalledWith('Adiós', false);
@@ -109,7 +109,7 @@ describe('MultipleChoice', () => {
       />
     );
 
-    const submitButton = screen.getByText('exercise.submit');
+    const submitButton = screen.getByText('lesson.exercise.checkAnswer');
     expect(submitButton).toBeDisabled();
   });
 
@@ -124,7 +124,7 @@ describe('MultipleChoice', () => {
     const option = screen.getByDisplayValue('Hola');
     fireEvent.click(option);
 
-    const submitButton = screen.getByText('exercise.submit');
+    const submitButton = screen.getByText('lesson.exercise.checkAnswer');
     expect(submitButton).not.toBeDisabled();
   });
 
@@ -142,7 +142,7 @@ describe('MultipleChoice', () => {
       expect(option).toBeDisabled();
     });
 
-    const submitButton = screen.getByText('exercise.submit');
+    const submitButton = screen.getByText('lesson.exercise.checkAnswer');
     expect(submitButton).toBeDisabled();
   });
 
@@ -176,14 +176,14 @@ describe('MultipleChoice', () => {
       />
     );
 
-    const radioGroup = screen.getByRole('radiogroup');
+    const radioGroup = screen.getByRole('group');
     expect(radioGroup).toBeInTheDocument();
 
     const radios = screen.getAllByRole('radio');
     expect(radios).toHaveLength(4);
 
     radios.forEach(radio => {
-      expect(radio).toHaveAttribute('name', 'mc1-choices');
+      expect(radio).toHaveAttribute('name', 'choice-mc1');
     });
   });
 });
